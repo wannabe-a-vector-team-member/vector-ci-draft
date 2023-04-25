@@ -18,10 +18,10 @@ name: Regression Detector
 on:
   # TODO re enable
   #pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "rfcs/**"
-      - "website/**"
+  #  paths-ignore:
+  #    - "docs/**"
+  #    - "rfcs/**"
+  #    - "website/**"
   merge_group:
     types: [checks_requested]
 
