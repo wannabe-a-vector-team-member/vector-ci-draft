@@ -37,6 +37,15 @@ jobs:
       run: true
     if: ${{ needs.changes.outputs.source == 'true' }}
 
+  test-cli:
+    uses: ./.github/workflows/cli.yml
+    needs: changes
+    secrets: inherit
+    with:
+      run: true
+    if: ${{ needs.changes.outputs.source == 'true' }}
+
+
   check-msrv:
     uses: ./.github/workflows/msrv.yml
     needs: changes

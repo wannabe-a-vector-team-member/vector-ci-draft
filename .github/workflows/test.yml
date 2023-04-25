@@ -68,61 +68,6 @@ jobs:
   #       run: scripts/upload-test-results.sh
   #       if: always()
 
-  # test-cli:
-  #   name: CLI - Linux
-  #   runs-on: [linux, ubuntu-20.04-8core]
-  #   needs: changes
-  #   env:
-  #     CARGO_INCREMENTAL: 0
-  #   if: ${{ needs.changes.outputs.source == 'true' }}
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/cache@v3
-  #       name: Cache Cargo registry + index
-  #       with:
-  #         path: |
-  #           ~/.cargo/bin/
-  #           ~/.cargo/registry/index/
-  #           ~/.cargo/registry/cache/
-  #           ~/.cargo/git/db/
-  #         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-cargo-
-  #     - run: sudo -E bash scripts/environment/bootstrap-ubuntu-20.04.sh
-  #     - run: bash scripts/environment/prepare.sh
-  #     - run: echo "::add-matcher::.github/matchers/rust.json"
-  #     - run: make test-cli
-  #     - name: Upload test results
-  #       run: scripts/upload-test-results.sh
-  #       if: always()
-
-  # test-misc:
-  #   name: Miscellaneous - Linux
-  #   runs-on: [linux, ubuntu-20.04-8core]
-  #   needs: changes
-  #   env:
-  #     CARGO_INCREMENTAL: 0
-  #   if: ${{ needs.changes.outputs.source == 'true' }}
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/cache@v3
-  #       name: Cache Cargo registry + index
-  #       with:
-  #         path: |
-  #           ~/.cargo/bin/
-  #           ~/.cargo/registry/index/
-  #           ~/.cargo/registry/cache/
-  #           ~/.cargo/git/db/
-  #         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-cargo-
-  #     - run: sudo -E bash scripts/environment/bootstrap-ubuntu-20.04.sh
-  #     - run: bash scripts/environment/prepare.sh
-  #     - run: echo "::add-matcher::.github/matchers/rust.json"
-  #     - run: make test-behavior
-  #     - run: make check-examples
-  #     - run: make test-docs
-
   # cross-linux:
   #   name: Cross - ${{ matrix.target }}
   #   runs-on: [linux, ubuntu-20.04-8core]
@@ -210,18 +155,7 @@ jobs:
   #     - run: echo "::add-matcher::.github/matchers/rust.json"
   #     - run: make check-component-features
 
-  # check-msrv:
-  #   name: Check minimum supported Rust version
-  #   runs-on: [linux, ubuntu-20.04-8core]
-  #   needs: changes
-  #   if: ${{ needs.changes.outputs.source == 'true' }}
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - run: sudo -E bash scripts/environment/bootstrap-ubuntu-20.04.sh
-  #     - run: cargo install cargo-msrv --version 0.15.1
-  #     - run: cargo msrv verify
-
-  # checks:
+   # checks:
   #   name: Checks
   #   runs-on: [linux, ubuntu-20.04-8core]
   #   needs: changes
