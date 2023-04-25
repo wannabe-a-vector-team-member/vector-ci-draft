@@ -31,15 +31,13 @@ jobs:
 
   unit-mac:
     uses: ./.github/workflows/unit_mac.yml
-    needs:
-      - changes
+    needs: changes
     secrets: inherit
     if: ${{ needs.changes.outputs.source == 'true' }}
 
   check-msrv:
     uses: ./.github/workflows/msrv.yml
-    needs:
-      - changes
+    needs: changes
     secrets: inherit
     if: ${{ needs.changes.outputs.source == 'true' }}
 
