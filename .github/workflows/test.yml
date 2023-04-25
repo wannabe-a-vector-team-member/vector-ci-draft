@@ -121,16 +121,6 @@ jobs:
   #       if: ${{ needs.cross-linux.result != 'success' }}
   #       run: exit 1
 
-  # test-windows:
-  #   name: Unit - Windows
-  #   runs-on: [windows, windows-2019-8core]
-  #   needs: changes
-  #   if: ${{ needs.changes.outputs.source == 'true' }}
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - run: .\scripts\environment\bootstrap-windows-2019.ps1
-  #     - run: make test
-
   # test-vrl:
   #   name: VRL - Linux
   #   continue-on-error: true
@@ -220,9 +210,7 @@ jobs:
     needs:
       - changes
       #- cross-linux
-      #- test-misc
       #- test-linux
-      #- test-windows
       #- test-vrl
       #- check-component-features
       #- checks

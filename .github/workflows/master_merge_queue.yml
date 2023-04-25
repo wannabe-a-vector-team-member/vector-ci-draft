@@ -29,14 +29,6 @@ jobs:
     uses: ./.github/workflows/changes.yml
     secrets: inherit
 
-  unit-mac:
-    uses: ./.github/workflows/unit_mac.yml
-    needs: changes
-    secrets: inherit
-    with:
-      run: true
-    if: ${{ needs.changes.outputs.source == 'true' }}
-
   test-cli:
     uses: ./.github/workflows/cli.yml
     needs: changes
@@ -45,9 +37,30 @@ jobs:
       run: true
     if: ${{ needs.changes.outputs.source == 'true' }}
 
+  test-misc:
+    uses: ./.github/workflows/misc.yml
+    needs: changes
+    secrets: inherit
+    with:
+      run: true
+    if: ${{ needs.changes.outputs.source == 'true' }}
 
   check-msrv:
     uses: ./.github/workflows/msrv.yml
+    needs: changes
+    secrets: inherit
+    if: ${{ needs.changes.outputs.source == 'true' }}
+
+  unit-mac:
+    uses: ./.github/workflows/unit_mac.yml
+    needs: changes
+    secrets: inherit
+    with:
+      run: true
+    if: ${{ needs.changes.outputs.source == 'true' }}
+
+  unit-windows:
+    uses: ./.github/workflows/unit_windows.yml
     needs: changes
     secrets: inherit
     if: ${{ needs.changes.outputs.source == 'true' }}
@@ -57,8 +70,11 @@ jobs:
     if: failure() && github.ref == 'refs/heads/master'
     needs:
       - changes
-      - unit-mac
+      - test-cli
+      - test-misc
       - check-msrv
+      - unit-mac
+      - unit-windows
     runs-on: ubuntu-20.04
     steps:
     - name: Discord notification
