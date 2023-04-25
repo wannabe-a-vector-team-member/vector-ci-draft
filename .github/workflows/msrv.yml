@@ -15,7 +15,6 @@ jobs:
   check-msrv:
     name: Check minimum supported Rust version
     runs-on: [linux, ubuntu-latest]
-    needs: changes
     steps:
       - uses: actions/checkout@v3
       - run: sudo -E bash scripts/environment/bootstrap-ubuntu-20.04.sh
