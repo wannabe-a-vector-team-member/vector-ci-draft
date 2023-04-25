@@ -64,7 +64,6 @@ jobs:
           path: "./target/${{ matrix.target }}/debug/vector"
 
   cross-linux-check:
-    if: ${{ needs.changes.outputs.dependencies == 'true' }}
     runs-on: ubuntu-20.04
     name: Cross - Linux
     needs: cross-linux
