@@ -2,7 +2,13 @@ name: Changes
 
 on:
   workflow_call:
-
+    outputs:
+      source: ${{ jobs.changes.outputs.source }}
+      dependencies: ${{ jobs.changes.outputs.dependencies }}
+      internal_events: ${{ jobs.changes.outputs.internal_events }}
+      cue: ${{ jobs.changes.outputs.cue }}
+      component_docs: ${{ jobs.changes.outputs.component_docs }}
+      markdown: ${{ jobs.changes.outputs.markdown }}
 jobs:
   changes:
     runs-on: ubuntu-20.04

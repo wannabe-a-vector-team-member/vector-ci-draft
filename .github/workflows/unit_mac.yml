@@ -2,6 +2,10 @@ name: Unit - Mac
 
 on:
   workflow_call:
+    inputs:
+      run:
+        type: boolean
+        default: false
   issue_comment:
     types: [created]
 
@@ -30,7 +34,7 @@ jobs:
     env:
       CARGO_INCREMENTAL: 0
     if: |
-      ${{ needs.changes.outputs.source == 'true' }} ||
+      ${{ inputs.run == true }} ||
       github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-unit-mac')
     steps:
       - uses: actions/checkout@v3

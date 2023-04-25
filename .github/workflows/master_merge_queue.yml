@@ -33,6 +33,8 @@ jobs:
     uses: ./.github/workflows/unit_mac.yml
     needs: changes
     secrets: inherit
+    with:
+      run: true
     if: ${{ needs.changes.outputs.source == 'true' }}
 
   check-msrv:
