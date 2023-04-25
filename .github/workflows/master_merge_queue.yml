@@ -59,6 +59,16 @@ jobs:
       run: true
     if: ${{ needs.changes.outputs.source == 'true' }}
 
+  cross-linux:
+    uses: ./.github/workflows/cross.yml
+    needs: changes
+    secrets: inherit
+    with:
+      run: true
+    # We run cross checks when dependencies change to ensure they still build.
+    # This helps us avoid adopting dependencies that aren't compatible with other architectures.
+    if: ${{ needs.changes.outputs.dependencies == 'true' }}
+
   unit-mac:
     uses: ./.github/workflows/unit_mac.yml
     needs: changes
@@ -82,6 +92,7 @@ jobs:
       - test-misc
       - check-msrv
       - check-component-features
+      - cross-linux
       - unit-mac
       - unit-windows
     runs-on: ubuntu-20.04
