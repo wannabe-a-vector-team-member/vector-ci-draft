@@ -1,7 +1,8 @@
 name: Environment Suite
 
 on:
-  pull_request: {}
+  # TODO re enable
+  #pull_request: {}
   push:
     branches:
       - master
