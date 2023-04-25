@@ -1,4 +1,4 @@
-name: Unit - Windows
+name: Component Features - Linux
 
 on:
   workflow_call:
@@ -25,13 +25,14 @@ env:
   CARGO_NET_GIT_FETCH_WITH_CLI: true
 
 jobs:
-
-  test-windows:
-    runs-on: [windows, windows-2019-8core]
+  check-component-features:
+    runs-on: [linux, ubuntu-20.04-8core]
     if: |
       ${{ inputs.run == true }} ||
-      github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-unit-windows')    
+      github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-component-features')    
     steps:
       - uses: actions/checkout@v3
-      - run: .\scripts\environment\bootstrap-windows-2019.ps1
-      - run: make test
+      - run: sudo -E bash scripts/environment/bootstrap-ubuntu-20.04.sh
+      - run: bash scripts/environment/prepare.sh
+      - run: echo "::add-matcher::.github/matchers/rust.json"
+      - run: make check-component-features

@@ -51,6 +51,14 @@ jobs:
     secrets: inherit
     if: ${{ needs.changes.outputs.source == 'true' }}
 
+  check-component-features:
+    uses: ./.github/workflows/component_features.yml
+    needs: changes
+    secrets: inherit
+    with:
+      run: true
+    if: ${{ needs.changes.outputs.source == 'true' }}
+
   unit-mac:
     uses: ./.github/workflows/unit_mac.yml
     needs: changes
@@ -73,6 +81,7 @@ jobs:
       - test-cli
       - test-misc
       - check-msrv
+      - check-component-features
       - unit-mac
       - unit-windows
     runs-on: ubuntu-20.04
