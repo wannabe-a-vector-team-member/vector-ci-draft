@@ -29,7 +29,7 @@ jobs:
     runs-on: [linux, ubuntu-20.04-8core]
     if: |
       ${{ inputs.run == true }} ||
-      github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-component-features')    
+      github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-component-features')
     steps:
       - uses: actions/checkout@v3
       - run: sudo -E bash scripts/environment/bootstrap-ubuntu-20.04.sh

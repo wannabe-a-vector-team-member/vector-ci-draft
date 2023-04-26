@@ -69,7 +69,7 @@ jobs:
     needs: cross-linux
     if: |
       ${{ inputs.run == true }} ||
-      github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-cross')    
+      github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-cross')
     steps:
       - name: Check cross matrix status
         if: ${{ needs.cross-linux.result != 'success' }}
