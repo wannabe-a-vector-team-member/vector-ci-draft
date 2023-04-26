@@ -2,10 +2,6 @@ name: Cross
 
 on:
   workflow_call:
-    inputs:
-      run:
-        type: boolean
-        default: false
   issue_comment:
     types: [created]
 
@@ -28,6 +24,9 @@ jobs:
   cross-linux:
     name: Cross - ${{ matrix.target }}
     runs-on: [linux, ubuntu-20.04-8core]
+    if: |
+      !github.event.pull_request
+      || github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-cross')
     env:
       CARGO_INCREMENTAL: 0
     strategy:
@@ -64,12 +63,9 @@ jobs:
           path: "./target/${{ matrix.target }}/debug/vector"
 
   cross-linux-check:
-    runs-on: ubuntu-20.04
     name: Cross - Linux
+    runs-on: ubuntu-20.04
     needs: cross-linux
-    if: |
-      ${{ inputs.run == true }} ||
-      github.event.issue.pull_request && contains(github.event.comment.body, '/ci-deploy-cross')
     steps:
       - name: Check cross matrix status
         if: ${{ needs.cross-linux.result != 'success' }}
