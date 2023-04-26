@@ -117,7 +117,7 @@ jobs:
           SPLUNK_VERSION: ${{ matrix.env.SPLUNK_VERSION }}
 
   test-integration-check:
-    name: test-integration-check
+    name: Integration Tests
     runs-on: ubuntu-20.04
     needs:
       - test-integration
