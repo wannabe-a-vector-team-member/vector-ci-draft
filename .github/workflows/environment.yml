@@ -1,12 +1,12 @@
 name: Environment Suite
 
 on:
-  # TODO re enable
-  #pull_request: {}
-  push:
-    branches:
-      - master
   workflow_dispatch:
+  workflow_call:
+  # Don't think this is needed since it will run in the merge queue
+  #push:
+  #  branches:
+  #    - master
 
 env:
   VERBOSE: true

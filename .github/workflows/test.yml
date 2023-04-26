@@ -4,9 +4,10 @@ on:
   pull_request:
   merge_group:
     types: [checks_requested]
-  push:
-    branches:
-      - master
+  # Don't think this is needed since it will run in the merge queue
+  #push:
+  #  branches:
+  #    - master
 
 concurrency:
   # For pull requests, cancel running workflows, for master, run all
