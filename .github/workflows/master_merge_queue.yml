@@ -82,7 +82,7 @@ jobs:
 
   master-failure:
     name: master-failure
-    if: failure() && github.ref == 'refs/heads/master'
+    if: failure() && github.ref == 'refs/heads/something_clever' # TODO just in case
     needs:
       - changes
       - test-cli
