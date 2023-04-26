@@ -2,7 +2,7 @@ name: Master Merge Queue Suite
 
 on:
   # TODO remove before merging
-  pull_request:
+  #pull_request:
   merge_group:
     types: [checks_requested]
 
