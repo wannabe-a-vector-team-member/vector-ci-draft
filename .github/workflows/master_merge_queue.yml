@@ -1,4 +1,4 @@
-name: Master Merge Queue Suite
+name: Master Merge Queue Test Suite
 
 on:
   # TODO remove before merging
