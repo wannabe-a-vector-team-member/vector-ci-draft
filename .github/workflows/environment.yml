@@ -1,9 +1,8 @@
 name: Environment Suite
 
 on:
-  workflow_dispatch:
   workflow_call:
-  # Don't think this is needed since it will run in the merge queue
+  # TODO temp disabling
   #push:
   #  branches:
   #    - master

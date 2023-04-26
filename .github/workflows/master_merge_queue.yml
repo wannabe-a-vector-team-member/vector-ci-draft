@@ -80,11 +80,6 @@ jobs:
     secrets: inherit
     if: ${{ needs.changes.outputs.source == 'true' }}
 
-  # TODO disabling to not publish on main repo
-  #publish-new-environment:
-  #  uses: ./.github/workflows/environment.yml
-  #  secrets: inherit
-
   master-failure:
     name: master-failure
     if: failure() && github.ref == 'refs/heads/master'
@@ -97,7 +92,6 @@ jobs:
       - cross-linux
       - unit-mac
       - unit-windows
-      #- publish-new-environment
     runs-on: ubuntu-20.04
     steps:
     - name: Discord notification
