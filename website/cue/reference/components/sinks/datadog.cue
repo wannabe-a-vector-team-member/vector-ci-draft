@@ -18,7 +18,7 @@ components: sinks: _datadog: {
 
 	configuration: {
 		default_api_key: {
-			description: "Default Datadog [API key](https://docs.datadoghq.com/api/?lang=bash#authentication), if an event has a key set in its metadata it will prevail over the one set here."
+			description: "default Datadog [API key](https://docs.datadoghq.com/api/?lang=bash#authentication), if an event has a key set in its metadata it will prevail over the one set here."
 			required:    true
 			warnings: []
 			type: string: {
