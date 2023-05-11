@@ -67,9 +67,9 @@ jobs:
       if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/ci-run-regression')
       uses: tspascoal/get-user-teams-membership@v2
       with:
-        username: ${{ github.event.issue_comment.sender }}
+        username: ${{ github.actor }}
         team: 'Vector'
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT_ORG }}
 
   compute-metadata-build:
     name: Compute metadata for building regression experiments
