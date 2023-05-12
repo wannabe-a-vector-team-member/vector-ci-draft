@@ -403,8 +403,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='pending' \
-            -f description='Experiments submitted to the Regression Detector cluster.' \
-            -f context='Regression Detector / submission' \
+            -f description='Experiments submitted to the Regression Detection cluster.' \
+            -f context='Regression Detection Suite / submission' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - uses: actions/checkout@v3
@@ -486,8 +486,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='failure' \
-            -f description='Experiments submitted to the Regression Detector cluster cancelled.' \
-            -f context='Regression Detector / submission' \
+            -f description='Experiments submitted to the Regression Detection cluster cancelled.' \
+            -f context='Regression Detection Suite / submission' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Check status, success
@@ -499,8 +499,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='success' \
-            -f description='Experiments submitted to the Regression Detector cluster successfully.' \
-            -f context='Regression Detector / submission' \
+            -f description='Experiments submitted to the Regression Detection cluster successfully.' \
+            -f context='Regression Detection Suite / submission' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Check status, failure
@@ -513,8 +513,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='success' \
-            -f description='Experiments submitted to the Regression Detector cluster failed.' \
-            -f context='Regression Detector / submission' \
+            -f description='Experiments submitted to the Regression Detection Suite failed.' \
+            -f context='Regression Detection Suite / submission' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   ##
@@ -566,8 +566,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='failure' \
-            -f description='Analyze experimental results from Regression Detector cancelled.' \
-            -f context='regression-check' \
+            -f description='Analyze experimental results from Regression Detection Suite cancelled.' \
+            -f context='Regression Detection Suite / detect-regression' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Check status, success
@@ -579,8 +579,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='success' \
-            -f description='Analyze experimental results from Regression Detector succeeded.' \
-            -f context='regression-check' \
+            -f description='Analyze experimental results from Regression Detection Suite succeeded.' \
+            -f context='Regression Detection Suite / detect-regression' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Check status, failure
@@ -593,8 +593,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='failure' \
-            -f description='Analyze experimental results from Regression Detector failed.' \
-            -f context='regression-check' \
+            -f description='Analyze experimental results from Regression Detection Suite failed.' \
+            -f context='Regression Detection Suite / detect-regression' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   analyze-experiment:
@@ -613,8 +613,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='pending' \
-            -f description='Analyze experimental results from Regression Detector.' \
-            -f context='Regression Detector / analyze-experiment' \
+            -f description='Analyze experimental results from Regression Detection Suite.' \
+            -f context='Regression Detection Suite / analyze-experiment' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - uses: actions/checkout@v3
@@ -677,8 +677,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='failure' \
-            -f description='Analyze experimental results from Regression Detector cancelled.' \
-            -f context='Regression Detector / analyze-experiment' \
+            -f description='Analyze experimental results from Regression Detection Suite cancelled.' \
+            -f context='Regression Detection Suite / analyze-experiment' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Check status, success
@@ -690,8 +690,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='success' \
-            -f description='Analyze experimental results from Regression Detector succeeded.' \
-            -f context='Regression Detector / analyze-experiment' \
+            -f description='Analyze experimental results from Regression Detection Suite succeeded.' \
+            -f context='Regression Detection Suite / analyze-experiment' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Check status, failure
@@ -704,11 +704,11 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/statuses/${{ needs.compute-metadata.outputs.comparison-sha }} \
             -f state='failure' \
-            -f description='Analyze experimental results from Regression Detector failed.' \
-            -f context='Regression Detector / analyze-experiment' \
+            -f description='Analyze experimental results from Regression Detection Suite failed.' \
+            -f context='Regression Detection Suite / analyze-experiment' \
             -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-  regression-check:
+  regression-detection-suite:
     name: Regression Detection Suite
     runs-on: ubuntu-latest
     if: |
@@ -736,7 +736,7 @@ jobs:
         if: github.event_name == 'issue_comment' && env.FAILED == 'true'
         uses: myrotvorets/set-commit-status-action@1.1.6
         with:
-          sha: ${{ steps.compute-metadata.outputs.comparison_sha }}
+          sha: ${{ steps.compute-metadata.outputs.comparison-sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
           status: 'failure'
 
@@ -744,7 +744,7 @@ jobs:
         if: github.event_name == 'issue_comment' && env.FAILED != 'true'
         uses: myrotvorets/set-commit-status-action@1.1.6
         with:
-          sha: ${{ steps.compute-metadata.outputs.comparison_sha }}
+          sha: ${{ steps.compute-metadata.outputs.comparison-sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
           status: 'success'
 
