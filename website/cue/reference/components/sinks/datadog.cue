@@ -27,7 +27,7 @@ components: sinks: _datadog: {
 		}
 		endpoint: {
 			common:        false
-			description:   "The endpoint to send data to."
+			description:   "The endpoint to send data to!"
 			relevant_when: "site is not set"
 			required:      false
 			type: string: {
