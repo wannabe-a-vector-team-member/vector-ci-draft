@@ -15,6 +15,14 @@ on:
       head_ref:
         required: true
         type: string
+      int_tests:
+        required: false
+        type: boolean
+        default: false
+      source:
+        required: false
+        type: boolean
+        default: true
     outputs:
       source:
         value: ${{ jobs.changes.outputs.source }}
@@ -33,71 +41,71 @@ on:
       k8s:
         value: ${{ jobs.changes.outputs.k8s }}
       all-int:
-        value: ${{ jobs.changes.outputs.all-int }}
+        value: ${{ jobs.change_int_tests.outputs.all-int }}
       amqp:
-        value: ${{ jobs.changes.outputs.amqp }}
+        value: ${{ jobs.change_int_tests.outputs.amqp }}
       appsignal:
-        value: ${{ jobs.changes.outputs.appsignal }}
+        value: ${{ jobs.change_int_tests.outputs.appsignal }}
       aws:
-        value: ${{ jobs.changes.outputs.aws }}
+        value: ${{ jobs.change_int_tests.outputs.aws }}
       axiom:
-        value: ${{ jobs.changes.outputs.axiom }}
+        value: ${{ jobs.change_int_tests.outputs.axiom }}
       azure:
-        value: ${{ jobs.changes.outputs.azure }}
+        value: ${{ jobs.change_int_tests.outputs.azure }}
       clickhouse:
-        value: ${{ jobs.changes.outputs.clickhouse }}
+        value: ${{ jobs.change_int_tests.outputs.clickhouse }}
       databend:
-        value: ${{ jobs.changes.outputs.databend }}
+        value: ${{ jobs.change_int_tests.outputs.databend }}
       datadog:
-        value: ${{ jobs.changes.outputs.datadog }}
+        value: ${{ jobs.change_int_tests.outputs.datadog }}
       dnstap:
-        value: ${{ jobs.changes.outputs.dnstap }}
+        value: ${{ jobs.change_int_tests.outputs.dnstap }}
       docker-logs:
-        value: ${{ jobs.changes.outputs.docker-logs }}
+        value: ${{ jobs.change_int_tests.outputs.docker-logs }}
       elasticsearch:
-        value: ${{ jobs.changes.outputs.elasticsearch }}
+        value: ${{ jobs.change_int_tests.outputs.elasticsearch }}
       eventsoredb:
-        value: ${{ jobs.changes.outputs.eventsoredb }}
+        value: ${{ jobs.change_int_tests.outputs.eventsoredb }}
       fluent:
-        value: ${{ jobs.changes.outputs.fluent }}
+        value: ${{ jobs.change_int_tests.outputs.fluent }}
       gcp:
-        value: ${{ jobs.changes.outputs.gcp }}
+        value: ${{ jobs.change_int_tests.outputs.gcp }}
       humio:
-        value: ${{ jobs.changes.outputs.humio }}
+        value: ${{ jobs.change_int_tests.outputs.humio }}
       http-client:
-        value: ${{ jobs.changes.outputs.http-client }}
+        value: ${{ jobs.change_int_tests.outputs.http-client }}
       influxdb:
-        value: ${{ jobs.changes.outputs.influxdb }}
+        value: ${{ jobs.change_int_tests.outputs.influxdb }}
       kafka:
-        value: ${{ jobs.changes.outputs.kafka }}
+        value: ${{ jobs.change_int_tests.outputs.kafka }}
       logstash:
-        value: ${{ jobs.changes.outputs.logstash }}
+        value: ${{ jobs.change_int_tests.outputs.logstash }}
       loki:
-        value: ${{ jobs.changes.outputs.loki }}
+        value: ${{ jobs.change_int_tests.outputs.loki }}
       mongodb:
-        value: ${{ jobs.changes.outputs.mongodb }}
+        value: ${{ jobs.change_int_tests.outputs.mongodb }}
       nats:
-        value: ${{ jobs.changes.outputs.nats }}
+        value: ${{ jobs.change_int_tests.outputs.nats }}
       nginx:
-        value: ${{ jobs.changes.outputs.nginx }}
+        value: ${{ jobs.change_int_tests.outputs.nginx }}
       opentelemetry:
-        value: ${{ jobs.changes.outputs.opentelemetry }}
+        value: ${{ jobs.change_int_tests.outputs.opentelemetry }}
       postgres:
-        value: ${{ jobs.changes.outputs.postgres }}
+        value: ${{ jobs.change_int_tests.outputs.postgres }}
       prometheus:
-        value: ${{ jobs.changes.outputs.prometheus }}
+        value: ${{ jobs.change_int_tests.outputs.prometheus }}
       pulsar:
-        value: ${{ jobs.changes.outputs.pulsar }}
+        value: ${{ jobs.change_int_tests.outputs.pulsar }}
       redis:
-        value: ${{ jobs.changes.outputs.redis }}
+        value: ${{ jobs.change_int_tests.outputs.redis }}
       splunk:
-        value: ${{ jobs.changes.outputs.splunk }}
+        value: ${{ jobs.change_int_tests.outputs.splunk }}
       webhdfs:
-        value: ${{ jobs.changes.outputs.webhdfs }}
+        value: ${{ jobs.change_int_tests.outputs.webhdfs }}
 
-jobs:
   changes:
     runs-on: ubuntu-20.04
+    if: ${{ inputs.source }}
     # Set job outputs to values from filter step
     outputs:
       # General source code
@@ -110,38 +118,6 @@ jobs:
       install: ${{ steps.filter.outputs.install }}
       # K8s
       k8s: ${{ steps.filter.outputs.k8s }}
-      # Integrations
-      all-int: ${{ steps.filter.outputs.all-int }}
-      amqp: ${{ steps.filter.outputs.amqp }}
-      appsignal: ${{ steps.filter.outputs.appsignal}}
-      aws: ${{ steps.filter.outputs.aws }}
-      axiom: ${{ steps.filter.outputs.axiom }}
-      azure: ${{ steps.filter.outputs.azure }}
-      clickhouse: ${{ steps.filter.outputs.clickhouse }}
-      databend: ${{ steps.filter.outputs.databend }}
-      datadog: ${{ steps.filter.outputs.datadog }}
-      dnstap: ${{ steps.filter.outputs.dnstap }}
-      docker-logs: ${{ steps.filter.outputs.docker-logs }}
-      elasticsearch: ${{ steps.filter.outputs.elasticsearch }}
-      evenstoredb: ${{ steps.filter.outputs.evenstoredb }}
-      fluent: ${{ steps.filter.outputs.fluent }}
-      gcp: ${{ steps.filter.outputs.gcp }}
-      humio: ${{ steps.filter.outputs.humio }}
-      http-client: ${{ steps.filter.outputs.http-client }}
-      influxdb: ${{ steps.filter.outputs.influxdb }}
-      kafka: ${{ steps.filter.outputs.kafka }}
-      logstash: ${{ steps.filter.outputs.logstash }}
-      loki: ${{ steps.filter.outputs.loki }}
-      mongodb: ${{ steps.filter.outputs.mongodb }}
-      nats: ${{ steps.filter.outputs.nats }}
-      nginx: ${{ steps.filter.outputs.nginx }}
-      opentelemetry: ${{ steps.filter.outputs.opentelemetry }}
-      postgres: ${{ steps.filter.outputs.postgres }}
-      prometheus: ${{ steps.filter.outputs.prometheus }}
-      pulsar: ${{ steps.filter.outputs.pulsar }}
-      redis: ${{ steps.filter.outputs.redis }}
-      splunk: ${{ steps.filter.outputs.splunk }}
-      webhdfs: ${{ steps.filter.outputs.webhdfs }}
     steps:
     - uses: actions/checkout@v3
 
@@ -332,3 +308,87 @@ jobs:
             - "src/sinks/webhdfs/**"
             - "src/sinks/util/**"
 
+  changes_int_tests:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.int_tests }}
+    outputs:
+      amqp: ${{ steps.filter.outputs.amqp }}
+      appsignal: ${{ steps.filter.outputs.appsignal}}
+      aws: ${{ steps.filter.outputs.aws }}
+      axiom: ${{ steps.filter.outputs.axiom }}
+      azure: ${{ steps.filter.outputs.azure }}
+      clickhouse: ${{ steps.filter.outputs.clickhouse }}
+      databend: ${{ steps.filter.outputs.databend }}
+      datadog: ${{ steps.filter.outputs.datadog }}
+      dnstap: ${{ steps.filter.outputs.dnstap }}
+      docker-logs: ${{ steps.filter.outputs.docker-logs }}
+      elasticsearch: ${{ steps.filter.outputs.elasticsearch }}
+      evenstoredb: ${{ steps.filter.outputs.evenstoredb }}
+      fluent: ${{ steps.filter.outputs.fluent }}
+      gcp: ${{ steps.filter.outputs.gcp }}
+      humio: ${{ steps.filter.outputs.humio }}
+      http-client: ${{ steps.filter.outputs.http-client }}
+      influxdb: ${{ steps.filter.outputs.influxdb }}
+      kafka: ${{ steps.filter.outputs.kafka }}
+      logstash: ${{ steps.filter.outputs.logstash }}
+      loki: ${{ steps.filter.outputs.loki }}
+      mongodb: ${{ steps.filter.outputs.mongodb }}
+      nats: ${{ steps.filter.outputs.nats }}
+      nginx: ${{ steps.filter.outputs.nginx }}
+      opentelemetry: ${{ steps.filter.outputs.opentelemetry }}
+      postgres: ${{ steps.filter.outputs.postgres }}
+      prometheus: ${{ steps.filter.outputs.prometheus }}
+      pulsar: ${{ steps.filter.outputs.pulsar }}
+      redis: ${{ steps.filter.outputs.redis }}
+      splunk: ${{ steps.filter.outputs.splunk }}
+      webhdfs: ${{ steps.filter.outputs.webhdfs }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: |
+          INTEGRATIONS="amqp
+          appsignal
+          aws
+          axiom
+          azure
+          clickhouse
+          databend
+          datadog
+          dnstap
+          docker-logs
+          elasticsearch
+          eventstoredb
+          fluent
+          gcp
+          humio
+          http-client
+          influxdb
+          kafka
+          logstash
+          loki
+          mongodb
+          nats
+          nginx
+          opentelemetry
+          postgres
+          prometheus
+          pulsar
+          redis
+          splunk
+          webhdfs"
+
+          echo 'all-int:' > int_test_filters.yaml
+          echo '- "lib/vector-core/**"' >> int_test_filters.yaml
+
+          for integration in ${INTEGRATIONS} ; do
+            echo '${integration}:' > int_test_filters.yaml
+            PATHS=$(cargo vdev int paths ${integration})
+            while IFS= read -r path ; do echo '- ${path}' >> int_test_filters.yaml ; done <<< "$PATHS"
+          done
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: ${{ inputs.base_ref }}
+          ref: ${{ inputs.head_ref }}
+          filters: int_test_filters.yaml
