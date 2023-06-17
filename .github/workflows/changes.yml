@@ -103,6 +103,7 @@ on:
       webhdfs:
         value: ${{ jobs.int_tests.outputs.webhdfs }}
 
+jobs:
   # Detects changes that are not specific to integration tests
   source:
     runs-on: ubuntu-20.04
