@@ -25,90 +25,89 @@ on:
         default: true
     outputs:
       source:
-        value: ${{ jobs.changes.outputs.source }}
+        value: ${{ jobs.source.outputs.source }}
       dependencies:
-        value: ${{ jobs.changes.outputs.dependencies }}
+        value: ${{ jobs.source.outputs.dependencies }}
       internal_events:
-        value: ${{ jobs.changes.outputs.internal_events }}
+        value: ${{ jobs.source.outputs.internal_events }}
       cue:
-        value: ${{ jobs.changes.outputs.cue }}
+        value: ${{ jobs.source.outputs.cue }}
       component_docs:
-        value: ${{ jobs.changes.outputs.component_docs }}
+        value: ${{ jobs.source.outputs.component_docs }}
       markdown:
-        value: ${{ jobs.changes.outputs.markdown }}
+        value: ${{ jobs.source.outputs.markdown }}
       install:
-        value: ${{ jobs.changes.outputs.install }}
+        value: ${{ jobs.source.outputs.install }}
       k8s:
-        value: ${{ jobs.changes.outputs.k8s }}
+        value: ${{ jobs.source.outputs.k8s }}
       all-int:
-        value: ${{ jobs.change_int_tests.outputs.all-int }}
+        value: ${{ jobs.int_tests.outputs.all-int }}
       amqp:
-        value: ${{ jobs.change_int_tests.outputs.amqp }}
+        value: ${{ jobs.int_tests.outputs.amqp }}
       appsignal:
-        value: ${{ jobs.change_int_tests.outputs.appsignal }}
+        value: ${{ jobs.int_tests.outputs.appsignal }}
       aws:
-        value: ${{ jobs.change_int_tests.outputs.aws }}
+        value: ${{ jobs.int_tests.outputs.aws }}
       axiom:
-        value: ${{ jobs.change_int_tests.outputs.axiom }}
+        value: ${{ jobs.int_tests.outputs.axiom }}
       azure:
-        value: ${{ jobs.change_int_tests.outputs.azure }}
+        value: ${{ jobs.int_tests.outputs.azure }}
       clickhouse:
-        value: ${{ jobs.change_int_tests.outputs.clickhouse }}
+        value: ${{ jobs.int_tests.outputs.clickhouse }}
       databend:
-        value: ${{ jobs.change_int_tests.outputs.databend }}
+        value: ${{ jobs.int_tests.outputs.databend }}
       datadog:
-        value: ${{ jobs.change_int_tests.outputs.datadog }}
+        value: ${{ jobs.int_tests.outputs.datadog }}
       dnstap:
-        value: ${{ jobs.change_int_tests.outputs.dnstap }}
+        value: ${{ jobs.int_tests.outputs.dnstap }}
       docker-logs:
-        value: ${{ jobs.change_int_tests.outputs.docker-logs }}
+        value: ${{ jobs.int_tests.outputs.docker-logs }}
       elasticsearch:
-        value: ${{ jobs.change_int_tests.outputs.elasticsearch }}
+        value: ${{ jobs.int_tests.outputs.elasticsearch }}
       eventsoredb:
-        value: ${{ jobs.change_int_tests.outputs.eventsoredb }}
+        value: ${{ jobs.int_tests.outputs.eventsoredb }}
       fluent:
-        value: ${{ jobs.change_int_tests.outputs.fluent }}
+        value: ${{ jobs.int_tests.outputs.fluent }}
       gcp:
-        value: ${{ jobs.change_int_tests.outputs.gcp }}
+        value: ${{ jobs.int_tests.outputs.gcp }}
       humio:
-        value: ${{ jobs.change_int_tests.outputs.humio }}
+        value: ${{ jobs.int_tests.outputs.humio }}
       http-client:
-        value: ${{ jobs.change_int_tests.outputs.http-client }}
+        value: ${{ jobs.int_tests.outputs.http-client }}
       influxdb:
-        value: ${{ jobs.change_int_tests.outputs.influxdb }}
+        value: ${{ jobs.int_tests.outputs.influxdb }}
       kafka:
-        value: ${{ jobs.change_int_tests.outputs.kafka }}
+        value: ${{ jobs.int_tests.outputs.kafka }}
       logstash:
-        value: ${{ jobs.change_int_tests.outputs.logstash }}
+        value: ${{ jobs.int_tests.outputs.logstash }}
       loki:
-        value: ${{ jobs.change_int_tests.outputs.loki }}
+        value: ${{ jobs.int_tests.outputs.loki }}
       mongodb:
-        value: ${{ jobs.change_int_tests.outputs.mongodb }}
+        value: ${{ jobs.int_tests.outputs.mongodb }}
       nats:
-        value: ${{ jobs.change_int_tests.outputs.nats }}
+        value: ${{ jobs.int_tests.outputs.nats }}
       nginx:
-        value: ${{ jobs.change_int_tests.outputs.nginx }}
+        value: ${{ jobs.int_tests.outputs.nginx }}
       opentelemetry:
-        value: ${{ jobs.change_int_tests.outputs.opentelemetry }}
+        value: ${{ jobs.int_tests.outputs.opentelemetry }}
       postgres:
-        value: ${{ jobs.change_int_tests.outputs.postgres }}
+        value: ${{ jobs.int_tests.outputs.postgres }}
       prometheus:
-        value: ${{ jobs.change_int_tests.outputs.prometheus }}
+        value: ${{ jobs.int_tests.outputs.prometheus }}
       pulsar:
-        value: ${{ jobs.change_int_tests.outputs.pulsar }}
+        value: ${{ jobs.int_tests.outputs.pulsar }}
       redis:
-        value: ${{ jobs.change_int_tests.outputs.redis }}
+        value: ${{ jobs.int_tests.outputs.redis }}
       splunk:
-        value: ${{ jobs.change_int_tests.outputs.splunk }}
+        value: ${{ jobs.int_tests.outputs.splunk }}
       webhdfs:
-        value: ${{ jobs.change_int_tests.outputs.webhdfs }}
+        value: ${{ jobs.int_tests.outputs.webhdfs }}
 
-  changes:
+  # Detects changes that are not specific to integration tests
+  source:
     runs-on: ubuntu-20.04
     if: ${{ inputs.source }}
-    # Set job outputs to values from filter step
     outputs:
-      # General source code
       source: ${{ steps.filter.outputs.source }}
       dependencies: ${{ steps.filter.outputs.dependencies }}
       internal_events: ${{ steps.filter.outputs.internal_events }}
@@ -116,7 +115,6 @@ on:
       component_docs: ${{ steps.filter.outputs.component_docs }}
       markdown: ${{ steps.filter.outputs.markdown }}
       install: ${{ steps.filter.outputs.install }}
-      # K8s
       k8s: ${{ steps.filter.outputs.k8s }}
     steps:
     - uses: actions/checkout@v3
@@ -176,7 +174,8 @@ on:
           k8s:
             - "src/sources/kubernetes_logs/**"
 
-  changes_int_tests:
+  # Detects changes that are specific to integration tests
+  int_tests:
     runs-on: ubuntu-latest
     if: ${{ inputs.int_tests }}
     outputs:
@@ -213,7 +212,11 @@ on:
     steps:
       - uses: actions/checkout@v3
 
-      - run: |
+      # creates a yaml file that contains the filters for each integration,
+      # extracted from the output of the `vdev int paths <>` command, which
+      # sources the paths from the scripts/integration/.../test.yaml file
+      - name: Create filter rules for integrations
+        run: |
           INTEGRATIONS="amqp
           appsignal
           aws
