@@ -260,6 +260,10 @@ jobs:
             while IFS= read -r path ; do echo '- ${path}' >> int_test_filters.yaml ; done <<< "$PATHS"
           done
 
+          echo ""
+          cat int_test_filters.yaml
+          echo ""
+
       - uses: dorny/paths-filter@v2
         id: filter
         with:
