@@ -18,8 +18,7 @@ on:
       int_tests:
         required: false
         type: boolean
-        # TODO change back to false
-        default: true
+        default: false
       source:
         required: false
         type: boolean
