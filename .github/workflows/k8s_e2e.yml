@@ -4,10 +4,13 @@
 #    - manual dispatch in GH UI
 #    - on a PR commit if the kubernetes_logs source was changed
 #    - in the merge queue
+#    - on a schedule at midnight UTC Tue-Sat
 #    - on demand by either of the following comments in a PR:
 #        - '/ci-run-k8s'
 #        - '/ci-run-all'
 #
+# If the workflow trigger is the nightly schedule, all the k8s versions
+# are run in the matrix, otherwise, only the latest is run.
 
 name: K8S E2E Suite
 
@@ -18,14 +21,12 @@ on:
     types: [created]
   merge_group:
     types: [checks_requested]
-  #schedule:
+  # schedule:
     # At midnight UTC Tue-Sat
-    #- cron: '0 0 * * 2-6'
-    # TODO temporary to test
-    #- cron: '11 20 * * *'
+    # - cron: '0 0 * * 2-6'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.event.issue.id || github.event.merge_group.base_sha || github.event.schedule || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.event.comment.html_url || github.event.merge_group.head_sha || github.event.schedule || github.sha }}
 
   cancel-in-progress: true
 
@@ -71,12 +72,12 @@ jobs:
 
       - name: (PR comment) Get PR branch
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: xt0rted/pull-request-comment-branch@v1
+        uses: xt0rted/pull-request-comment-branch@v2
         id: comment-branch
 
       - name: (PR comment) Set latest commit status as pending
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: myrotvorets/set-commit-status-action@1.1.6
+        uses: myrotvorets/set-commit-status-action@v1.1.7
         with:
           sha: ${{ steps.comment-branch.outputs.head_sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -92,8 +93,6 @@ jobs:
         if: ${{ github.event_name != 'issue_comment' }}
         uses: actions/checkout@v3
 
-      # - run: make ci-sweep
-
       # - uses: actions/cache@v3
       #   with:
       #     path: |
@@ -108,11 +107,20 @@ jobs:
 
       # - uses: actions/upload-artifact@v3
       #   with:
-      #     name: e2e-test-deb-package
-      #     path: target/artifacts/*
+      #     sha: ${{ steps.comment-branch.outputs.head_sha }}
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     status: pending
 
       - name: (PR comment) Set latest commit status as 'failure'
         uses: myrotvorets/set-commit-status-action@1.1.6
+        if: failure() && github.event_name == 'issue_comment'
+        with:
+          sha: ${{ steps.comment-branch.outputs.head_sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: 'failure'
+
+      - name: (PR comment) Set latest commit status as 'failure'
+        uses: myrotvorets/set-commit-status-action@v1.1.7
         if: failure() && github.event_name == 'issue_comment'
         with:
           sha: ${{ steps.comment-branch.outputs.head_sha }}
@@ -198,7 +206,7 @@ jobs:
     steps:
       - name: (PR comment) Get PR branch
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: xt0rted/pull-request-comment-branch@v1
+        uses: xt0rted/pull-request-comment-branch@v2
         id: comment-branch
 
       - name: (PR comment) Checkout PR branch
@@ -230,7 +238,7 @@ jobs:
       #     CARGO_INCREMENTAL: 0
 
       - name: (PR comment) Set latest commit status as failure
-        uses: myrotvorets/set-commit-status-action@1.1.6
+        uses: myrotvorets/set-commit-status-action@v1.1.7
         if: failure() && github.event_name == 'issue_comment'
         with:
           sha: ${{ steps.comment-branch.outputs.head_sha }}
@@ -238,7 +246,7 @@ jobs:
           status: 'failure'
 
   final-result:
-    name: K8S E2E Suite
+    name: K8s E2E Suite
     runs-on: ubuntu-latest
     needs: test-e2e-kubernetes
     if: |
@@ -257,12 +265,12 @@ jobs:
 
       - name: (PR comment) Get PR branch
         if: success() && github.event_name == 'issue_comment'
-        uses: xt0rted/pull-request-comment-branch@v1
+        uses: xt0rted/pull-request-comment-branch@v2
         id: comment-branch
 
       - name: (PR comment) Submit PR result as success
         if: success() && github.event_name == 'issue_comment'
-        uses: myrotvorets/set-commit-status-action@1.1.6
+        uses: myrotvorets/set-commit-status-action@v1.1.7
         with:
           sha: ${{ steps.comment-branch.outputs.head_sha }}
           token: ${{ secrets.GITHUB_TOKEN }}

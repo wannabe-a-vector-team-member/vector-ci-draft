@@ -2,7 +2,7 @@
 #
 # This workflow runs under the following conditions:
 #    - in the merge queue if any source files were modified, added or deleted.
-#    - on demand by a  PR comment matching either of:
+#    - on demand by a PR comment matching either of:
 #      - '/ci-run-regression'
 #      - '/ci-run-all'
 #      (the comment issuer must be a member of the Vector GH team)
@@ -34,7 +34,7 @@ on:
   pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.issue.id || github.event.merge_group.head_sha || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event.merge_group.head_sha || github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -47,8 +47,6 @@ jobs:
       source_changed: ${{ steps.filter.outputs.SOURCE_CHANGED }}
       comment_valid: ${{ steps.comment.outputs.isTeamMember }}
     steps:
-    - run: sleep 60 # give us time to build up the queue
-
     - uses: actions/checkout@v3
 
     - name: Collect file changes
@@ -63,6 +61,8 @@ jobs:
           all_changed:
             - added|deleted|modified: "**"
           ignore:
+            - "./.github/**"
+            - "./.gitignore"
             - "distribution/**"
             - "rust-doc/**"
             - "docs/**"
@@ -79,7 +79,7 @@ jobs:
 
     # This step allows us to conservatively run the tests if we added a new
     # file or directory for source code, but forgot to add it to this workflow.
-    # Instead, we may unecessarily run the test on new file or dir additions that
+    # Instead, we may unnecessarily run the test on new file or dir additions that
     # wouldn't likely introduce regressions.
     - name: Determine if should not run due to irrelevant file changes
       id: filter
@@ -178,7 +178,6 @@ jobs:
             exit 1
           fi
 
-
       # If triggered by merge queue, the PR number is not available in the payload. While we restrict the number of PRs in the
       # queue to 1, we can get the PR number by parsing the merge queue temp branch's ref.
       - name: Get PR metadata (merge queue)
@@ -264,12 +263,12 @@ jobs:
 
       - name: (PR comment) Get PR branch
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: xt0rted/pull-request-comment-branch@v1
+        uses: xt0rted/pull-request-comment-branch@v2
         id: comment-branch
 
       - name: (PR comment) Set latest commit status as pending
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: myrotvorets/set-commit-status-action@1.1.6
+        uses: myrotvorets/set-commit-status-action@v1.1.7
         with:
           sha: ${{ steps.pr-metadata-comment.outputs.COMPARISON_SHA }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -771,7 +770,6 @@ jobs:
   #           -f description='Analyze experimental results from Regression Detection Suite failed.' \
   #           -f context='Regression Detection Suite / analyze-experiment' \
   #           -f target_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
 
   # This job always runs- if an issue_comment triggered it, we need to update the check status in the PR,
   # and if a pull_request triggered it, we need to flag the check status as a success.

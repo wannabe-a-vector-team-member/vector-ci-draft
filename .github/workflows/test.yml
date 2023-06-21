@@ -4,12 +4,10 @@ on:
   pull_request:
   merge_group:
     types: [checks_requested]
-  issue_comment:
-    types: [created]
 
 concurrency:
   # `github.event.number` exists for pull requests, otherwise fall back to SHA for merge queue
-  group: ${{ github.workflow }}-${{ github.event.number || github.event.merge_group.base_sha }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.event.merge_group.head_sha }}
   cancel-in-progress: true
 
 env:
@@ -29,7 +27,6 @@ env:
 
 jobs:
   changes:
-    if: github.event_name != 'issue_comment' || (github.event.issue.pull_request && contains(github.event.comment.body, '/ci-run-all'))
     uses: ./.github/workflows/changes.yml
     secrets: inherit
     with:
@@ -46,8 +43,7 @@ jobs:
       CARGO_INCREMENTAL: 0
     if: ${{ needs.changes.outputs.source == 'true' }}
     steps:
-      - name: mock
-        run: echo "OK"
+      - run: echo "mock"
       # - uses: actions/checkout@v3
       # - uses: actions/cache@v3
       #   name: Cache Cargo registry + index
@@ -77,8 +73,7 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.source == 'true' || needs.changes.outputs.cue == 'true' }}
     steps:
-      - name: mock
-        run: echo "OK"
+      - run: echo "mock"
       # - uses: actions/checkout@v3
       # - run: sudo -E bash scripts/environment/bootstrap-ubuntu-20.04.sh
       # - run: bash scripts/environment/prepare.sh
@@ -91,9 +86,7 @@ jobs:
     env:
       CARGO_INCREMENTAL: 0
     steps:
-      - name: mock
-        run: echo "OK"
-
+      - run: echo "mock"
       # - uses: actions/checkout@v3
       #   with:
       #     # check-version needs tags
@@ -118,8 +111,8 @@ jobs:
       # - name: Check clippy
       #   if: needs.changes.outputs.source == 'true'
       #   run: make check-clippy
-      # #- name: Check version
-      # #  run: make check-version
+      # - name: Check version
+      #   run: make check-version
       # - name: Check scripts
       #   run: make check-scripts
       # - name: Check events
@@ -128,6 +121,9 @@ jobs:
       # - name: Check cargo deny advisories/licenses
       #   if: needs.changes.outputs.dependencies == 'true' || needs.changes.outputs.deny == 'true'
       #   run: make check-deny
+      # - name: Check that the 3rd-party license file is up to date
+      #   if: needs.changes.outputs.dependencies == 'true'
+      #   run: make check-licenses
       # - name: Check Cue docs
       #   if: needs.changes.outputs.cue == 'true'
       #   run: make check-docs
@@ -146,14 +142,23 @@ jobs:
       #     path: "/tmp/vector-config-schema.json"
       #   if: success() || failure()
 
+  # This is a required status check, so it always needs to run if prior jobs failed, in order to mark the status correctly.
   all-checks:
     name: Test Suite
     runs-on: ubuntu-20.04
+    if: always()
     needs:
       - checks
       - test-vrl
       - test-linux
+    env:
+      FAILED: ${{ contains(needs.*.result, 'failure') }}
     steps:
-      - name: validate
-        run: echo "OK"
+      - run: |
+          echo "failed=${{ env.FAILED }}"
+          if [[ "$FAILED" == "true" ]] ; then
+            exit 1
+          else
+            exit 0
+          fi
 

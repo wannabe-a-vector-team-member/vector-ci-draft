@@ -20,6 +20,9 @@ env:
   CONTAINER_TOOL: "docker"
   DD_ENV: "ci"
   DD_API_KEY: ${{ secrets.DD_API_KEY }}
+  TEST_DATADOG_API_KEY: ${{ secrets.CI_TEST_DATADOG_API_KEY }}
+  TEST_APPSIGNAL_PUSH_API_KEY: ${{ secrets.TEST_APPSIGNAL_PUSH_API_KEY }}
+  AXIOM_TOKEN: ${{ secrets.AXIOM_TOKEN }}
   RUST_BACKTRACE: full
   TEST_LOG: vector=debug
   VERBOSE: true
@@ -42,201 +45,297 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-    runs-on: ubuntu-latest
+    runs-on: [linux, ubuntu-20.04-8core]
     needs: changes
-    timeout-minutes: 45
+    if: |
+      github.event_name == 'merge_group' || (
+        needs.changes.outputs.int-all == 'true'
+          || needs.changes.outputs.amqp == 'true'
+          || needs.changes.outputs.appsignal == 'true'
+          || needs.changes.outputs.aws == 'true'
+          || needs.changes.outputs.axiom == 'true'
+          || needs.changes.outputs.azure == 'true'
+          || needs.changes.outputs.clickhouse == 'true'
+          || needs.changes.outputs.databend == 'true'
+          || needs.changes.outputs.datadog == 'true'
+          || needs.changes.outputs.dnstap == 'true'
+          || needs.changes.outputs.docker-logs == 'true'
+          || needs.changes.outputs.elasticsearch == 'true'
+          || needs.changes.outputs.eventstoredb == 'true'
+          || needs.changes.outputs.fluent == 'true'
+          || needs.changes.outputs.gcp == 'true'
+          || needs.changes.outputs.humio == 'true'
+          || needs.changes.outputs.http-client == 'true'
+          || needs.changes.outputs.influxdb == 'true'
+          || needs.changes.outputs.kafka == 'true'
+          || needs.changes.outputs.logstash == 'true'
+          || needs.changes.outputs.loki == 'true'
+          || needs.changes.outputs.mongodb == 'true'
+          || needs.changes.outputs.nats == 'true'
+          || needs.changes.outputs.nginx == 'true'
+          || needs.changes.outputs.opentelemetry == 'true'
+          || needs.changes.outputs.postgres == 'true'
+          || needs.changes.outputs.prometheus == 'true'
+          || needs.changes.outputs.pulsar == 'true'
+          || needs.changes.outputs.redis == 'true'
+          || needs.changes.outputs.splunk == 'true'
+          || needs.changes.outputs.webhdfs == 'true'
+      )
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v3
 
-       # TODO don't do these steps if no changes and not merge group
-      - run: make ci-sweep
-
       - run: sudo npm -g install @datadog/datadog-ci
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.amqp == 'true' }}
-        run: cargo vdev -v int test -a amqp ; cargo vdev -v int stop amqp
+      - run: docker image prune -af ; docker container prune -f
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.appsignal == 'true' }}
-        env:
-          TEST_APPSIGNAL_PUSH_API_KEY: ${{ secrets.TEST_APPSIGNAL_PUSH_API_KEY }}
-        run: cargo vdev -v int test -a appsignal ; cargo vdev -v int stop appsignal
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.amqp == 'true' }}
+        name: amqp
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 25
+          max_attempts: 3
+          retry_on: error
+          command: cargo vdev -v int start amqp ; sleep 5 ; cargo vdev -v int test -a amqp ; cargo vdev -v int stop amqp
+
+      # skip this because we don't have the secrets defined here rn
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.appsignal == 'true' }}
+      #   run: cargo vdev -v int test -a appsignal ; cargo vdev -v int stop appsignal
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.aws == 'true' }}
-        run: cargo vdev -v int test -a aws ; cargo vdev -v int stop aws
+        name: aws
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_on: error
+          command: cargo vdev -v int start aws ; sleep 5 ; cargo vdev -v int test -a aws ; RET=$? ; cargo vdev -v int stop aws ; exit $RET
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.axiom == 'true' }}
-        env:
-          AXIOM_TOKEN: ${{ secrets.AXIOM_TOKEN }}
-        run: cargo vdev -v int test -a axiom ; cargo vdev -v int stop axiom
+      # skip this because we don't have the secrets defined here rn
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.axiom == 'true' }}
+      #  name: axiom
+      #   run: cargo vdev -v int test -a axiom ; cargo vdev -v int stop axiom
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.azure == 'true' }}
-        run: cargo vdev -v int test -a azure ; cargo vdev -v int stop azure
+        name: azure
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start azure ; sleep 5 ; cargo vdev -v int test -a azure ; RET=$? ; cargo vdev -v int stop azure ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.clickhouse == 'true' }}
-        run: cargo vdev -v int test -a clickhouse ; cargo vdev -v int stop clickhouse
+        name: clickhouse
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start clickhouse ; sleep 5 ; cargo vdev -v int test -a clickhouse ; RET=$? ; cargo vdev -v int stop clickhouse ; exit $RET
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.databend == 'true' }}
-        run: cargo vdev -v int test -a databend ; cargo vdev -v int stop databend
+      # skip this because we don't have the secrets defined here rn
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.databend == 'true' }}
+      #  name: databend
+      #   run: cargo vdev -v int start databend ; sleep 5 ; cargo vdev -v int test -a databend ; cargo vdev -v int stop databend ; sleep 5
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.datadog == 'true' }}
-        env:
-          TEST_DATADOG_API_KEY: ${{ secrets.CI_TEST_DATADOG_API_KEY }}
-        run: |
-          cargo vdev -v int test -a datadog-agent   ; cargo vdev -v int stop datadog-agent
-          cargo vdev -v int test -a datadog-logs    ; cargo vdev -v int stop datadog-logs
-          cargo vdev -v int test -a datadog-metrics ; cargo vdev -v int stop datadog-metrics
-          cargo vdev -v int test -a datadog-traces  ; cargo vdev -v int stop datadog-traces
+      # skip this because we don't have the secrets defined here rn
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.datadog == 'true' }}
+      #  name: datadog
+      #   cargo vdev -v int start aws ; sleep 5 ; run: |
+      #     cargo vdev -v int test -a datadog-agent   ; cargo vdev -v int stop datadog-agent
+      #     cargo vdev -v int test -a datadog-logs    ; cargo vdev -v int stop datadog-logs
+      #     cargo vdev -v int test -a datadog-metrics ; cargo vdev -v int stop datadog-metrics
+      #     cargo vdev -v int test -a datadog-traces  ; cargo vdev -v int stop datadog-traces
+
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.dnstap == 'true' }}
-        run: cargo vdev -v int test -a dnstap ; cargo vdev -v int stop dnstap
+        name: dnstap
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start dnstap ; sleep 5 ; cargo vdev -v int test -a dnstap ; RET=$? ; cargo vdev -v int stop dnstap ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.docker-logs == 'true' }}
-        run: cargo vdev -v int test -a docker-logs ; cargo vdev -v int stop docker-logs
+        name: docker-logs
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start docker-logs ; sleep 5 ; cargo vdev -v int test -a docker-logs ; RET=$? ; cargo vdev -v int stop docker-logs ; exit $RET
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.elasticsearch == 'true' }}
-        run: cargo vdev -v int test -a elasticsearch ; cargo vdev -v int stop elasticsearch
+      - run: docker image prune -af --filter=label!=vector-test-runner=true ; docker container prune -f
+
+      # skip this because we don't have the secrets defined here rn
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.elasticsearch == 'true' }}
+      # name: elasticsearch
+        # uses: nick-fields/retry@v2
+        # with:
+        #   timeout_minutes: 5
+        #   max_attempts: 3
+        #   command: cargo vdev -v int start elasticsearch ; sleep 5 ; cargo vdev -v int test -a elasticsearch ; cargo vdev -v int stop elasticsearch
+      #   run: cargo vdev -v int start elasticsearch ; sleep 5 ; cargo vdev -v int test -a elasticsearch ; cargo vdev -v int stop elasticsearch ; sleep 5
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.eventstoredb == 'true' }}
-        run: cargo vdev -v int test -a eventstoredb ; cargo vdev -v int stop eventstoredb
+        name: eventstoredb
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start eventstoredb ; sleep 5 ; cargo vdev -v int test -a eventstoredb ; RET=$? ; cargo vdev -v int stop eventstoredb ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.fluent == 'true' }}
-        run: cargo vdev -v int test -a fluent ; cargo vdev -v int stop fluent
+        name: fluent
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start fluent ; sleep 5 ; cargo vdev -v int test -a fluent ; RET=$? ; cargo vdev -v int stop fluent ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.gcp == 'true' }}
-        run: cargo vdev -v int test -a gcp ; cargo vdev -v int stop gcp
+        name: gcp
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start gcp ; sleep 5 ; cargo vdev -v int test -a gcp ; RET=$? ; cargo vdev -v int stop gcp ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.humio == 'true' }}
-        run: cargo vdev -v int test -a humio ; cargo vdev -v int stop humio
+        name: humio
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start humio ; sleep 5 ; cargo vdev -v int test -a humio ; RET=$? ; cargo vdev -v int stop humio ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.http-client == 'true' }}
-        run: cargo vdev -v int test -a http-client ; cargo vdev -v int stop http-client
+        name: http-client
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start http-client ; sleep 5 ; cargo vdev -v int test -a http-client ; RET=$? ; cargo vdev -v int stop http-client ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.influxdb == 'true' }}
-        run: cargo vdev -v int test -a influxdb ; cargo vdev -v int stop influxdb
+        name: influxdb
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start influxdb ; sleep 5 ; cargo vdev -v int test -a influxdb ; RET=$? ; cargo vdev -v int stop influxdb ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.kafka == 'true' }}
-        run: cargo vdev -v int test -a kafka ; cargo vdev -v int stop kafka
+        name: kafka
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start kafka ; sleep 5 ; cargo vdev -v int test -a kafka ; RET=$? ; cargo vdev -v int stop kafka ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.logstash == 'true' }}
-        run: cargo vdev -v int test -a logstash ; cargo vdev -v int stop logstash
+        name: logstash
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start logstash ; sleep 5 ; cargo vdev -v int test -a logstash ; RET=$? ; cargo vdev -v int stop logstash ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.loki == 'true' }}
-        run: cargo vdev -v int test -a loki ; cargo vdev -v int stop loki
+        name: loki
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start loki ; sleep 5 ; cargo vdev -v int test -a loki ; RET=$? ; cargo vdev -v int stop loki ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.mongodb == 'true' }}
-        run: cargo vdev -v int test -a mongodb ; cargo vdev -v int stop mongodb
+        name: mongodb
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start mongodb ; sleep 5 ; cargo vdev -v int test -a mongodb ; RET=$? ; cargo vdev -v int stop mongodb ; exit $RET
+
+      - run: docker image prune -af --filter=label!=vector-test-runner=true ; docker container prune -f
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.nats == 'true' }}
-        run: cargo vdev -v int test -a nats ; cargo vdev -v int stop nats
+        name: nats
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start nats ; sleep 5 ; cargo vdev -v int test -a nats ; RET=$? ; cargo vdev -v int stop nats ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.nginx == 'true' }}
-        run: cargo vdev -v int test -a nginx ; cargo vdev -v int stop nginx
+        name: nginx
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start nginx ; sleep 5 ; cargo vdev -v int test -a nginx ; RET=$? ; cargo vdev -v int stop nginx ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.opentelemetry == 'true' }}
-        run: cargo vdev -v int test -a opentelemetry ; cargo vdev -v int stop opentelemetry
+        name: opentelemetry
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start opentelemetry ; sleep 5 ; cargo vdev -v int test -a opentelemetry ; RET=$? ; cargo vdev -v int stop opentelemetry ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.postgres == 'true' }}
-        run: cargo vdev -v int test -a postgres ; cargo vdev -v int stop postgres
+        name: postgres
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start postgres ; sleep 5 ; cargo vdev -v int test -a postgres ; RET=$? ; cargo vdev -v int stop postgres ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.prometheus == 'true' }}
-        run: cargo vdev -v int test -a prometheus ; cargo vdev -v int stop prometheus
+        name: prometheus
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start prometheus ; sleep 5 ; cargo vdev -v int test -a prometheus ; RET=$? ; cargo vdev -v int stop prometheus ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.pulsar == 'true' }}
-        run: cargo vdev -v int test -a pulsar ; cargo vdev -v int stop pulsar
+        name: pulsar
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start pulsar ; sleep 5 ; cargo vdev -v int test -a pulsar ; RET=$? ; cargo vdev -v int stop pulsar ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.redis == 'true' }}
-        run: cargo vdev -v int test -a redis ; cargo vdev -v int stop redis
+        name: redis
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start redis ; sleep 5 ; cargo vdev -v int test -a redis ; RET=$? ; cargo vdev -v int stop redis ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' }}
-        run: cargo vdev -v int test -a shutdown ; cargo vdev -v int stop shutdown
+        name: shutdown
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start shutdown ; sleep 5 ; cargo vdev -v int test -a shutdown ; RET=$? ; cargo vdev -v int stop shutdown ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.splunk == 'true' }}
-        run: cargo vdev -v int test -a splunk ; cargo vdev -v int stop splunk
+        name: splunk
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 7
+          max_attempts: 3
+          command: cargo vdev -v int start splunk ; sleep 5 ; cargo vdev -v int test -a splunk ; RET=$? ; cargo vdev -v int stop splunk ; exit $RET
 
       - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.webhdfs == 'true' }}
-        run: cargo vdev -v int test -a webhdfs ; cargo vdev -v int stop webhdfs
-
-
-  # Calls the Integration Test workflow for each integration that was detected to have files changed that impact it.
-  # integration-matrix:
-  #   uses: ./.github/workflows/integration-test.yml
-  #   with:
-  #     if: ${{ matrix.run.if }}
-  #     test_name: ${{ matrix.run.test_name }}
-  #   needs: changes
-  #   secrets: inherit
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       run:
-  #         - test_name: 'amqp'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.amqp == 'true' }}
-  #         - test_name: 'appsignal'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.appsignal == 'true' }}
-  #         - test_name: 'aws'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.aws == 'true' }}
-  #         - test_name: 'axiom'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.axiom == 'true' }}
-  #         - test_name: 'azure'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.azure == 'true' }}
-  #         - test_name: 'clickhouse'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.clickhouse == 'true' }}
-  #         - test_name: 'databend'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.databend == 'true' }}
-  #         - test_name: 'datadog-agent'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.datadog == 'true' }}
-  #         - test_name: 'datadog-logs'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.datadog == 'true' }}
-  #         - test_name: 'datadog-metrics'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.datadog == 'true' }}
-  #         - test_name: 'datadog-traces'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.datadog == 'true' }}
-  #         - test_name: 'dnstap'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.dnstap == 'true' }}
-  #         - test_name: 'docker-logs'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.docker-logs == 'true' }}
-  #         - test_name: 'elasticsearch'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.elasticsearch == 'true' }}
-  #         - test_name: 'eventstoredb'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.eventstoredb == 'true' }}
-  #         - test_name: 'fluent'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.fluent == 'true' }}
-  #         - test_name: 'gcp'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.gcp == 'true' }}
-  #         - test_name: 'humio'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.humio == 'true' }}
-  #         - test_name: 'http-client'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.http-client == 'true' }}
-  #         - test_name: 'influxdb'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.influxdb == 'true' }}
-  #         - test_name: 'kafka'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.kafka == 'true' }}
-  #         - test_name: 'logstash'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.logstash == 'true' }}
-  #         - test_name: 'loki'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.loki == 'true' }}
-  #         - test_name: 'mongodb'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.mongodb == 'true' }}
-  #         - test_name: 'nats'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.nats == 'true' }}
-  #         - test_name: 'nginx'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.nginx == 'true' }}
-  #         - test_name: 'opentelemetry'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.opentelemetry == 'true' }}
-  #         - test_name: 'postgres'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.postgres == 'true' }}
-  #         - test_name: 'prometheus'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.prometheus == 'true' }}
-  #         - test_name: 'pulsar'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.pulsar == 'true' }}
-  #         - test_name: 'redis'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.redis == 'true' }}
-  #         - test_name: 'shutdown'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' }}
-  #         - test_name: 'splunk'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.splunk == 'true' }}
-  #         - test_name: 'webhdfs'
-  #           if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.webhdfs == 'true' }}
+        name: webhdfs
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo vdev -v int start webhdfs ; sleep 5 ; cargo vdev -v int test -a webhdfs ; RET=$? ; cargo vdev -v int stop webhdfs ; exit $RET
 
   integration-test-suite:
     name: Integration Test Suite

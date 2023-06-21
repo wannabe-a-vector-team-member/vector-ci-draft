@@ -64,8 +64,8 @@ on:
         value: ${{ jobs.int_tests.outputs.docker-logs }}
       elasticsearch:
         value: ${{ jobs.int_tests.outputs.elasticsearch }}
-      eventsoredb:
-        value: ${{ jobs.int_tests.outputs.eventsoredb }}
+      eventstoredb:
+        value: ${{ jobs.int_tests.outputs.eventstoredb }}
       fluent:
         value: ${{ jobs.int_tests.outputs.fluent }}
       gcp:
@@ -125,7 +125,6 @@ jobs:
       with:
         base: ${{ inputs.base_ref }}
         ref: ${{ inputs.head_ref }}
-        # TODO check if worth keying off the other internal components that the k8s tests utilize, suspect not.
         filters: |
           source:
             - ".github/workflows/test.yml"
@@ -191,7 +190,7 @@ jobs:
       dnstap: ${{ steps.filter.outputs.dnstap }}
       docker-logs: ${{ steps.filter.outputs.docker-logs }}
       elasticsearch: ${{ steps.filter.outputs.elasticsearch }}
-      evenstoredb: ${{ steps.filter.outputs.evenstoredb }}
+      eventstoredb: ${{ steps.filter.outputs.eventstoredb }}
       fluent: ${{ steps.filter.outputs.fluent }}
       gcp: ${{ steps.filter.outputs.gcp }}
       humio: ${{ steps.filter.outputs.humio }}
