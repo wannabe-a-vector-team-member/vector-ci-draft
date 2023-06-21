@@ -251,16 +251,16 @@ jobs:
           splunk
           webhdfs"
 
-          echo 'all-int:' > int_test_filters.yaml
+          echo "all-int:" > int_test_filters.yaml
           echo '- "lib/vector-core/**"' >> int_test_filters.yaml
 
           for integration in ${INTEGRATIONS} ; do
-            echo '${integration}:' > int_test_filters.yaml
+            echo "${integration}:" >> int_test_filters.yaml
             PATHS=$(cargo vdev int paths ${integration})
-            while IFS= read -r path ; do echo '- ${path}' >> int_test_filters.yaml ; done <<< "$PATHS"
+            while IFS= read -r path ; do echo "- \"${path}\"" >> int_test_filters.yaml ; done <<< "$PATHS"
           done
 
-          echo ""
+          echo "int_test_filters.yaml="
           cat int_test_filters.yaml
           echo ""
 
