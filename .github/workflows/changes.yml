@@ -225,7 +225,10 @@ jobs:
           azure
           clickhouse
           databend
-          datadog
+          datadog-agent
+          datadog-logs
+          datadog-metrics
+          datadog-traces
           dnstap
           docker-logs
           elasticsearch
