@@ -91,7 +91,7 @@ jobs:
         run: |
           echo "
               cargo vdev -v int test -a \$1
-              RET=$?
+              RET=\$?
               cargo vdev -v int stop \$1
               ./scripts/upload-test-results.sh
               exit $RET
