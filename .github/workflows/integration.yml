@@ -47,7 +47,7 @@ jobs:
     needs: changes
     if: |
       github.event_name == 'merge_group' || (
-        needs.changes.outputs.int-all == 'true'
+        needs.changes.outputs.all-int == 'true'
           || needs.changes.outputs.amqp == 'true'
           || needs.changes.outputs.appsignal == 'true'
           || needs.changes.outputs.aws == 'true'
@@ -98,7 +98,7 @@ jobs:
           " > int_test.sh
           cat int_test.sh
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.amqp == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.amqp == 'true' }}
         name: amqp
         uses: nick-fields/retry@v2
         with:
@@ -109,10 +109,10 @@ jobs:
           # command: cargo vdev -v int start amqp ; sleep 10 ; cargo vdev -v int test -a amqp ; cargo vdev -v int stop amqp
 
       # skip this because we don't have the secrets defined here rn
-      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.appsignal == 'true' }}
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.appsignal == 'true' }}
       #   run: cargo vdev -v int test -a appsignal ; cargo vdev -v int stop appsignal
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.aws == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.aws == 'true' }}
         name: aws
         uses: nick-fields/retry@v2
         with:
@@ -123,11 +123,11 @@ jobs:
           command: sh int_test.sh aws
 
       # skip this because we don't have the secrets defined here rn
-      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.axiom == 'true' }}
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.axiom == 'true' }}
       #  name: axiom
       #   run: cargo vdev -v int test -a axiom ; cargo vdev -v int stop axiom
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.azure == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.azure == 'true' }}
         name: azure
         uses: nick-fields/retry@v2
         with:
@@ -136,7 +136,7 @@ jobs:
           # command: cargo vdev -v int start azure ; sleep 10 ; cargo vdev -v int test -a azure ; RET=$? ; cargo vdev -v int stop azure ; exit $RET
           command: sh int_test.sh azure
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.clickhouse == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.clickhouse == 'true' }}
         name: clickhouse
         uses: nick-fields/retry@v2
         with:
@@ -146,12 +146,12 @@ jobs:
           command: sh int_test.sh clickhouse
 
       # skip this because we don't have the secrets defined here rn
-      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.databend == 'true' }}
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.databend == 'true' }}
       #  name: databend
       #   run: cargo vdev -v int start databend ; sleep 10 ; cargo vdev -v int test -a databend ; cargo vdev -v int stop databend ; sleep 10
 
       # skip this because we don't have the secrets defined here rn
-      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.datadog == 'true' }}
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.datadog == 'true' }}
       #  name: datadog
       #   cargo vdev -v int start aws ; sleep 10 ; run: |
       #     cargo vdev -v int test -a datadog-agent   ; cargo vdev -v int stop datadog-agent
@@ -160,7 +160,7 @@ jobs:
       #     cargo vdev -v int test -a datadog-traces  ; cargo vdev -v int stop datadog-traces
 
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.dnstap == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.dnstap == 'true' }}
         name: dnstap
         uses: nick-fields/retry@v2
         with:
@@ -169,7 +169,7 @@ jobs:
           # command: cargo vdev -v int start dnstap ; sleep 10 ; cargo vdev -v int test -a dnstap ; RET=$? ; cargo vdev -v int stop dnstap ; exit $RET
           command: sh int_test.sh dnstap
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.docker-logs == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.docker-logs == 'true' }}
         name: docker-logs
         uses: nick-fields/retry@v2
         with:
@@ -181,7 +181,7 @@ jobs:
       - run: docker image prune -af --filter=label!=vector-test-runner=true ; docker container prune -f
 
       # skip this because we don't have the secrets defined here rn
-      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.elasticsearch == 'true' }}
+      # - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.elasticsearch == 'true' }}
       # name: elasticsearch
         # uses: nick-fields/retry@v2
         # with:
@@ -190,7 +190,7 @@ jobs:
         #   command: cargo vdev -v int start elasticsearch ; sleep 10 ; cargo vdev -v int test -a elasticsearch ; cargo vdev -v int stop elasticsearch
       #   run: cargo vdev -v int start elasticsearch ; sleep 10 ; cargo vdev -v int test -a elasticsearch ; cargo vdev -v int stop elasticsearch ; sleep 10
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.eventstoredb == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.eventstoredb == 'true' }}
         name: eventstoredb
         uses: nick-fields/retry@v2
         with:
@@ -199,7 +199,7 @@ jobs:
           # command: cargo vdev -v int start eventstoredb ; sleep 10 ; cargo vdev -v int test -a eventstoredb ; RET=$? ; cargo vdev -v int stop eventstoredb ; exit $RET
           command: sh int_test.sh eventstoredb
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.fluent == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.fluent == 'true' }}
         name: fluent
         uses: nick-fields/retry@v2
         with:
@@ -208,7 +208,7 @@ jobs:
           # command: cargo vdev -v int start fluent ; sleep 10 ; cargo vdev -v int test -a fluent ; RET=$? ; cargo vdev -v int stop fluent ; exit $RET
           command: sh int_test.sh fluent
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.gcp == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.gcp == 'true' }}
         name: gcp
         uses: nick-fields/retry@v2
         with:
@@ -217,7 +217,7 @@ jobs:
           # command: cargo vdev -v int start gcp ; sleep 10 ; cargo vdev -v int test -a gcp ; RET=$? ; cargo vdev -v int stop gcp ; exit $RET
           command: sh int_test.sh gcp
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.humio == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.humio == 'true' }}
         name: humio
         uses: nick-fields/retry@v2
         with:
@@ -226,7 +226,7 @@ jobs:
           # command: cargo vdev -v int start humio ; sleep 10 ; cargo vdev -v int test -a humio ; RET=$? ; cargo vdev -v int stop humio ; exit $RET
           command: sh int_test.sh humio
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.http-client == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.http-client == 'true' }}
         name: http-client
         uses: nick-fields/retry@v2
         with:
@@ -235,7 +235,7 @@ jobs:
           # command: cargo vdev -v int start http-client ; sleep 10 ; cargo vdev -v int test -a http-client ; RET=$? ; cargo vdev -v int stop http-client ; exit $RET
           command: sh int_test.sh http-client
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.influxdb == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.influxdb == 'true' }}
         name: influxdb
         uses: nick-fields/retry@v2
         with:
@@ -244,7 +244,7 @@ jobs:
           # command: cargo vdev -v int start influxdb ; sleep 10 ; cargo vdev -v int test -a influxdb ; RET=$? ; cargo vdev -v int stop influxdb ; exit $RET
           command: sh int_test.sh influxdb
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.kafka == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.kafka == 'true' }}
         name: kafka
         uses: nick-fields/retry@v2
         with:
@@ -253,7 +253,7 @@ jobs:
           # command: cargo vdev -v int start kafka ; sleep 10 ; cargo vdev -v int test -a kafka ; RET=$? ; cargo vdev -v int stop kafka ; exit $RET
           command: sh int_test.sh kafka
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.logstash == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.logstash == 'true' }}
         name: logstash
         uses: nick-fields/retry@v2
         with:
@@ -262,7 +262,7 @@ jobs:
           # command: cargo vdev -v int start logstash ; sleep 10 ; cargo vdev -v int test -a logstash ; RET=$? ; cargo vdev -v int stop logstash ; exit $RET
           command: sh int_test.sh logstash
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.loki == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.loki == 'true' }}
         name: loki
         uses: nick-fields/retry@v2
         with:
@@ -271,7 +271,7 @@ jobs:
           # command: cargo vdev -v int start loki ; sleep 10 ; cargo vdev -v int test -a loki ; RET=$? ; cargo vdev -v int stop loki ; exit $RET
           command: sh int_test.sh loki
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.mongodb == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.mongodb == 'true' }}
         name: mongodb
         uses: nick-fields/retry@v2
         with:
@@ -282,7 +282,7 @@ jobs:
 
       - run: docker image prune -af --filter=label!=vector-test-runner=true ; docker container prune -f
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.nats == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.nats == 'true' }}
         name: nats
         uses: nick-fields/retry@v2
         with:
@@ -291,7 +291,7 @@ jobs:
           # command: cargo vdev -v int start nats ; sleep 10 ; cargo vdev -v int test -a nats ; RET=$? ; cargo vdev -v int stop nats ; exit $RET
           command: sh int_test.sh nats
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.nginx == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.nginx == 'true' }}
         name: nginx
         uses: nick-fields/retry@v2
         with:
@@ -300,7 +300,7 @@ jobs:
           # command: cargo vdev -v int start nginx ; sleep 10 ; cargo vdev -v int test -a nginx ; RET=$? ; cargo vdev -v int stop nginx ; exit $RET
           command: sh int_test.sh nginx
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.opentelemetry == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.opentelemetry == 'true' }}
         name: opentelemetry
         uses: nick-fields/retry@v2
         with:
@@ -309,7 +309,7 @@ jobs:
           # command: cargo vdev -v int start opentelemetry ; sleep 10 ; cargo vdev -v int test -a opentelemetry ; RET=$? ; cargo vdev -v int stop opentelemetry ; exit $RET
           command: sh int_test.sh opentelemetry
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.postgres == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.postgres == 'true' }}
         name: postgres
         uses: nick-fields/retry@v2
         with:
@@ -318,7 +318,7 @@ jobs:
           # command: cargo vdev -v int start postgres ; sleep 10 ; cargo vdev -v int test -a postgres ; RET=$? ; cargo vdev -v int stop postgres ; exit $RET
           command: sh int_test.sh postgres
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.prometheus == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.prometheus == 'true' }}
         name: prometheus
         uses: nick-fields/retry@v2
         with:
@@ -327,7 +327,7 @@ jobs:
           # command: cargo vdev -v int start prometheus ; sleep 10 ; cargo vdev -v int test -a prometheus ; RET=$? ; cargo vdev -v int stop prometheus ; exit $RET
           command: sh int_test.sh prometheus
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.pulsar == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.pulsar == 'true' }}
         name: pulsar
         uses: nick-fields/retry@v2
         with:
@@ -336,7 +336,7 @@ jobs:
           # command: cargo vdev -v int start pulsar ; sleep 10 ; cargo vdev -v int test -a pulsar ; RET=$? ; cargo vdev -v int stop pulsar ; exit $RET
           command: sh int_test.sh pulsar
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.redis == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.redis == 'true' }}
         name: redis
         uses: nick-fields/retry@v2
         with:
@@ -345,7 +345,7 @@ jobs:
           # command: cargo vdev -v int start redis ; sleep 10 ; cargo vdev -v int test -a redis ; RET=$? ; cargo vdev -v int stop redis ; exit $RET
           command: sh int_test.sh redis
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' }}
         name: shutdown
         uses: nick-fields/retry@v2
         with:
@@ -354,7 +354,7 @@ jobs:
           # command: cargo vdev -v int start shutdown ; sleep 10 ; cargo vdev -v int test -a shutdown ; RET=$? ; cargo vdev -v int stop shutdown ; exit $RET
           command: sh int_test.sh shutdown
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.splunk == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.splunk == 'true' }}
         name: splunk
         uses: nick-fields/retry@v2
         with:
@@ -363,7 +363,7 @@ jobs:
           # command: cargo vdev -v int start splunk ; sleep 10 ; cargo vdev -v int test -a splunk ; RET=$? ; cargo vdev -v int stop splunk ; exit $RET
           command: sh int_test.sh splunk
 
-      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.int-all == 'true' || needs.changes.outputs.webhdfs == 'true' }}
+      - if: ${{ github.event_name == 'merge_group' || needs.changes.outputs.all-int == 'true' || needs.changes.outputs.webhdfs == 'true' }}
         name: webhdfs
         uses: nick-fields/retry@v2
         with:
