@@ -63,7 +63,7 @@ pub fn is_retriable_error<T>(error: &SdkError<T>) -> bool {
             // Now just look for those when it's a client_error
             let re = RETRIABLE_CODES.get_or_init(|| {
                 RegexSet::new(["RequestTimeout", "RequestExpired", "ThrottlingException"])
-                    .expect("invalid regex")
+                    .expect("invalid regex!")
             });
 
             let status = raw.http().status();
