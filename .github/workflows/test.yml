@@ -122,9 +122,9 @@ jobs:
       # - name: Check that the 3rd-party license file is up to date
       #   if: needs.changes.outputs.dependencies == 'true'
       #   run: make check-licenses
-      # - name: Check Cue docs
+      - name: Check Cue docs
         # if: needs.changes.outputs.cue == 'true'
-        # run: make check-docs
+        run: make check-docs
       - name: Check Markdown
         # if: needs.changes.outputs.markdown == 'true'
         run: make check-markdown
@@ -132,7 +132,7 @@ jobs:
         # if: needs.changes.outputs.source == 'true' || needs.changes.outputs.component_docs == 'true'
         run: make check-component-docs
       - name: Check Rust Docs
-        if: needs.changes.outputs.source == 'true'
+        # if: needs.changes.outputs.source == 'true'
         run: cd rust-doc && make docs
       - uses: actions/upload-artifact@v3
         with:
