@@ -298,7 +298,7 @@ base: components: sources: http_client: configuration: {
 		required: false
 		type: object: {
 			examples: [{
-				field: ["value"]
+				field1: ["value"]
 				fruit: ["mango", "papaya", "kiwi"]
 			}]
 			options: "*": {
