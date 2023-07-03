@@ -21,10 +21,10 @@ set -x
 
 INTEGRATION=$1
 
-cargo vdev -v int start "${INTEGRATION}"
-sleep 15
+#cargo vdev -v int start "${INTEGRATION}"
+#sleep 15
 cargo vdev -v int test -a "${INTEGRATION}"
 RET=$?
-cargo vdev -v int stop "${INTEGRATION}"
+#cargo vdev -v int stop "${INTEGRATION}"
 #./scripts/upload-test-results.sh
 exit $RET
