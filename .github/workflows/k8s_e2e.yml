@@ -42,6 +42,27 @@ env:
   PROFILE: debug
 
 jobs:
+  validate:
+    name: Validate comment
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'issue_comment' && github.event.issue.pull_request &&
+        ( contains(github.event.comment.body, '/ci-run-all') ||
+          contains(github.event.comment.body, '/ci-run-k8s')
+        )
+    steps:
+      - name: Get PR comment author
+        id: comment
+        uses: tspascoal/get-user-teams-membership@v2
+        with:
+          username: ${{ github.actor }}
+          team: 'Vector'
+          GITHUB_TOKEN: ${{ secrets.GH_PAT_ORG }}
+
+      - name: Validate author membership
+        if: steps.comment.outputs.isTeamMember == 'false'
+        run: exit 1
+
   changes:
     if: github.event_name != 'issue_comment' || (github.event.issue.pull_request &&
           (contains(github.event.comment.body, '/ci-run-k8s') || contains(github.event.comment.body, '/ci-run-all')))
@@ -54,7 +75,7 @@ jobs:
   build-x86_64-unknown-linux-gnu:
     name: Build - x86_64-unknown-linux-gnu
     runs-on: [linux, ubuntu-20.04-4core]
-    needs: changes
+    needs: [changes, validate]
     if: github.event_name != 'pull_request' || needs.changes.outputs.k8s == 'true'
     # cargo-deb requires a release build, but we don't need optimizations for tests
     env:
@@ -135,7 +156,7 @@ jobs:
   compute-k8s-test-plan:
     name: Compute K8s test plan
     runs-on: ubuntu-20.04
-    needs: changes
+    needs: [changes, validate]
     if: github.event_name != 'pull_request' || needs.changes.outputs.k8s == 'true'
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
