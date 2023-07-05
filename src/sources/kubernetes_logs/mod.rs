@@ -81,6 +81,8 @@ const FILE_KEY: &str = "file";
 /// The `self_node_name` value env var key.
 const SELF_NODE_NAME_ENV_KEY: &str = "VECTOR_SELF_NODE_NAME";
 
+// hihi
+
 /// Configuration for the `kubernetes_logs` source.
 #[serde_as]
 #[configurable_component(source("kubernetes_logs", "Collect Pod logs from Kubernetes Nodes."))]
