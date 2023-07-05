@@ -134,3 +134,9 @@ jobs:
     if: contains(github.event.comment.body, '/ci-run-all') || contains(github.event.comment.body, '/ci-run-regression')
     uses: ./.github/workflows/regression.yml
     secrets: inherit
+
+  k8s:
+    needs: validate
+    if: contains(github.event.comment.body, '/ci-run-all') || contains(github.event.comment.body, '/ci-run-k8s')
+    uses: ./.github/workflows/k8s_e2e.yml
+    secrets: inherit
