@@ -196,10 +196,15 @@ jobs:
     needs:
       - build-x86_64-unknown-linux-gnu
       - compute-k8s-test-plan
+    if: always() # because `changes` job might be skipped
     strategy:
       matrix: ${{ fromJson(needs.compute-k8s-test-plan.outputs.matrix) }}
       fail-fast: false
     steps:
+      - name: Bail if deps failed
+        if: contains(needs.*.result, 'failure') == 'true'
+        run: exit 1
+
       - name: (PR comment) Get PR branch
         if: ${{ github.event_name == 'issue_comment' }}
         uses: xt0rted/pull-request-comment-branch@v2
