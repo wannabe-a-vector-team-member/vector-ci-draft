@@ -57,6 +57,7 @@ jobs:
           || contains(github.event.comment.body, '/ci-run-environment')
           || contains(github.event.comment.body, '/ci-run-install')
           || contains(github.event.comment.body, '/ci-run-regression')
+          || contains(github.event.comment.body, '/ci-run-k8s')
       )
     steps:
       - name: Get PR comment author
