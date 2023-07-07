@@ -82,9 +82,7 @@ jobs:
 
       - run: docker image prune -af ; docker container prune -f
 
-      - run: |
-          export DD_API_KEY=$DD_API_KEY 
-          export FOO=hihi
+      - run: export FOO=hihi
 
       - name: amqp
         if: ${{ contains(github.event.comment.body, '/ci-run-integration-amqp') || contains(github.event.comment.body, '/ci-run-all') }}
@@ -93,7 +91,8 @@ jobs:
           # First one requires more time, as we need to build the image from scratch
           timeout_minutes: 30
           max_attempts: 3
-          command: bash scripts/ci-integration-test.sh amqp
+          shell: bash
+          command: scripts/ci-integration-test.sh amqp
 
       # - name: appsignal
       #   if: ${{ contains(github.event.comment.body, '/ci-run-integration-appsignal') || contains(github.event.comment.body, '/ci-run-all') }}
@@ -101,7 +100,8 @@ jobs:
       #   with:
       #     timeout_minutes: 30
       #     max_attempts: 3
-      #     command: bash  scripts/ci-integration-test.sh appsignal
+      #     shell: bash
+      #     command:  scripts/ci-integration-test.sh appsignal
 
       - name: aws
         if: ${{ contains(github.event.comment.body, '/ci-run-integration-aws') || contains(github.event.comment.body, '/ci-run-all') }}
@@ -109,7 +109,8 @@ jobs:
         with:
           timeout_minutes: 30
           max_attempts: 3
-          command: bash  scripts/ci-integration-test.sh aws
+          shell: bash
+          command: scripts/ci-integration-test.sh aws
 
       # - name: axiom
       #   if: ${{ contains(github.event.comment.body, '/ci-run-integration-axiom') || contains(github.event.comment.body, '/ci-run-all') }}
@@ -125,7 +126,8 @@ jobs:
         with:
           timeout_minutes: 30
           max_attempts: 3
-          command: bash  scripts/ci-integration-test.sh azure
+          shell: bash
+          command: scripts/ci-integration-test.sh azure
 
       - name: clickhouse
         if: ${{ contains(github.event.comment.body, '/ci-run-integration-clickhouse') || contains(github.event.comment.body, '/ci-run-all') }}
