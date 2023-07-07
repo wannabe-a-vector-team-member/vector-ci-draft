@@ -6,6 +6,8 @@
 //!
 //! Logs and metrics are stored on an per app basis and require an app-level Push API key.
 
+// please please please can i be a vector team member please
+
 #[cfg(all(test, feature = "appsignal-integration-tests"))]
 mod integration_tests;
 
@@ -45,7 +47,7 @@ enum FinishError {
 }
 
 /// Configuration for the `appsignal` sink.
-#[configurable_component(sink("appsignal", "Send events to AppSignal."))]
+#[configurable_component(sink("appsignal"))]
 #[derive(Clone, Debug, Default)]
 pub struct AppsignalSinkConfig {
     /// The URI for the AppSignal API to send data to.
@@ -106,7 +108,6 @@ impl SinkBatchSettings for AppsignalDefaultBatchSettings {
 impl_generate_config_from_default!(AppsignalSinkConfig);
 
 #[async_trait::async_trait]
-#[typetag::serde(name = "appsignal")]
 impl SinkConfig for AppsignalSinkConfig {
     async fn build(
         &self,
@@ -251,7 +252,7 @@ mod test {
                 .expect("config should be valid");
         config.endpoint = mock_endpoint.to_string();
 
-        let context = SinkContext::default();
+        let context = SinkContext::new_test();
         let (sink, _healthcheck) = config.build(context).await.unwrap();
 
         let event = Event::Log(LogEvent::from("simple message"));
