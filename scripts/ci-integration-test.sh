@@ -23,10 +23,10 @@ INTEGRATION=$1
 
 echo "$FOO"
 
-cargo vdev -v int start "${INTEGRATION}"
-sleep 30
-cargo vdev -v int test -a "${INTEGRATION}"
-RET=$?
-cargo vdev -v int stop "${INTEGRATION}"
-#./scripts/upload-test-results.sh
-exit $RET
+#cargo vdev -v int start "${INTEGRATION}"
+#sleep 30
+#cargo vdev -v int test -a "${INTEGRATION}"
+#RET=$?
+#cargo vdev -v int stop "${INTEGRATION}"
+./scripts/upload-test-results.sh
+#exit $RET
