@@ -21,6 +21,8 @@ set -x
 
 INTEGRATION=$1
 
+echo $FOO
+
 #cargo vdev -v int start "${INTEGRATION}"
 #sleep 15
 cargo vdev -v int test -a "${INTEGRATION}"
