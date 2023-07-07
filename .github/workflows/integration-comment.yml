@@ -82,8 +82,6 @@ jobs:
 
       - run: docker image prune -af ; docker container prune -f
 
-      - run: export FOO=hihi
-
       - name: amqp
         if: ${{ contains(github.event.comment.body, '/ci-run-integration-amqp') || contains(github.event.comment.body, '/ci-run-all') }}
         uses: nick-fields/retry@v2
@@ -93,6 +91,8 @@ jobs:
           max_attempts: 3
           shell: bash
           command: scripts/ci-integration-test.sh amqp
+
+      - run: ./scripts/upload-test-results.sh
 
       # - name: appsignal
       #   if: ${{ contains(github.event.comment.body, '/ci-run-integration-appsignal') || contains(github.event.comment.body, '/ci-run-all') }}
