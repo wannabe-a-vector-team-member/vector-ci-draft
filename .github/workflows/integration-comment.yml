@@ -82,9 +82,9 @@ jobs:
 
       - run: docker image prune -af ; docker container prune -f
 
-      - run: export FOO="hihi"
-
       - name: amqp
+        env:
+         FOO: "hihi"
         if: ${{ contains(github.event.comment.body, '/ci-run-integration-amqp') || contains(github.event.comment.body, '/ci-run-all') }}
         uses: nick-fields/retry@v2.8.0
         with:
