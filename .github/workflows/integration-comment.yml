@@ -86,7 +86,7 @@ jobs:
         env:
          FOO: "hihi"
         if: ${{ contains(github.event.comment.body, '/ci-run-integration-amqp') || contains(github.event.comment.body, '/ci-run-all') }}
-        uses: nick-fields/retry@v2.8.0
+        uses: nick-fields/retry@v2
         with:
           # First one requires more time, as we need to build the image from scratch
           timeout_minutes: 30
